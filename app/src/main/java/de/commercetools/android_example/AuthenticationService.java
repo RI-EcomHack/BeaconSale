@@ -1,9 +1,11 @@
 package de.commercetools.android_example;
 
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.os.IBinder;
 import android.util.Base64;
+import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.Response;
@@ -17,6 +19,7 @@ import java.util.Map;
 
 public class AuthenticationService extends Service {
     private GlobalRequestQueue globalRequestQueue;
+    private Context context;
 
     public AuthenticationService() {
     }
@@ -33,7 +36,9 @@ public class AuthenticationService extends Service {
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        // show error page
+                        if(error.networkResponse != null) {
+                            showAuthenticationFailedToast();
+                        }
                     }
                 }) {
 
@@ -46,6 +51,18 @@ public class AuthenticationService extends Service {
         };
     }
 
+    private void showAuthenticationFailedToast() {
+        final CharSequence text = "Authentication failed!\n" +
+                "Check your credentials. See README.md for details.";
+
+        final Toast toast = Toast.makeText(context, text, Toast.LENGTH_LONG);
+        toast.show();
+    }
+
+    /**
+     * Set your credentials in credentials.xml (consult the readme for details)
+     * https://github.com/sphereio/commercetools-android-example/tree/master#commercetools-android-example
+     */
     private String createBasicAuthToken() {
         final byte[] bytes = (getString(R.string.clientId) + ":" + getString(R.string.clientSecret)).getBytes();
         return android.util.Base64.encodeToString(bytes, Base64.DEFAULT);
@@ -57,7 +74,8 @@ public class AuthenticationService extends Service {
 
     @Override
     public IBinder onBind(Intent intent) {
-        globalRequestQueue = GlobalRequestQueue.getInstance(this);
+        context = this.getApplicationContext();
+        globalRequestQueue = GlobalRequestQueue.getInstance(context);
         return new AuthenticationServiceBinder(this);
     }
 }

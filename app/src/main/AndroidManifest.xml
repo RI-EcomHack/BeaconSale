@@ -23,10 +23,12 @@
             android:enabled="true"
             android:exported="false" >
         </service>
-        <service android:name=".AuthenticationService"
+        <service
+            android:name=".AuthenticationService"
             android:enabled="true"
             android:exported="false" >
         </service>
+
     </application>
 
 </manifest>
