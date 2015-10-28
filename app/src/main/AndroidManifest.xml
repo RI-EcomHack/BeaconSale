@@ -23,7 +23,7 @@
             android:enabled="true"
             android:exported="false" >
         </service>
-        <service android:name="de.commercetools.android_example.AuthenticationService"
+        <service android:name=".AuthenticationService"
             android:enabled="true"
             android:exported="false" >
         </service>
