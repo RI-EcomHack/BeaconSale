@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="authUrl">https://auth.sphere.io/oauth/token?grant_type=client_credentials&amp;scope=manage_project:</string>
+    <string name="authUrl">https://auth.sphere.io/oauth/token</string>
+    <string name="grantType">grant_type=client_credentials</string>
+    <string name="scope">scope=manage_project:</string>
 </resources>

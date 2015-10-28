@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">commercetools-android-example</string>
     <string name="credentialsError">There was a problem with your credentials please check the readme</string>
+    <string name="executeExampleRequest">Get Products</string>
 </resources>
