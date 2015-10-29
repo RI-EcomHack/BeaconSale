@@ -63,7 +63,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void executeExampleRequest(View view) {
         if(bound) {
-            sphereService.executeRequest(Request.Method.GET, "/products",
+            sphereService.executeRequest(Request.Method.GET, "/products", "",
                     new Response.Listener<JSONObject>() {
                         @Override
                         public void onResponse(JSONObject response) {

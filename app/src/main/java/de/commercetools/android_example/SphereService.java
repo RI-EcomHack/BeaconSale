@@ -33,9 +33,9 @@ public class SphereService extends Service {
     public SphereService() {
     }
 
-    public void executeRequest(final int method, final String url, final Response.Listener<JSONObject> listener, final Response.ErrorListener errorListener) {
+    public void executeRequest(final int method, final String url, final String requestBody, final Response.Listener<JSONObject> listener, final Response.ErrorListener errorListener) {
         globalRequestQueue.addToRequestQueue(
-                new AuthorizedJsonRequest(method, sphereApiHost + projectKey + url, listener, new Response.ErrorListener() {
+                new AuthorizedJsonRequest(method, sphereApiHost + projectKey + url, requestBody, listener, new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         if (error.networkResponse != null && error.networkResponse.statusCode == HTTP_UNAUTHORIZED) {
@@ -44,7 +44,7 @@ public class SphereService extends Service {
                                         @Override
                                         public void onResponse(JSONObject response) {
                                             setAccessToken(response);
-                                            executeRequest(method, url, listener, errorListener);
+                                            executeRequest(method, url, requestBody, listener, errorListener);
                                         }
                                     }
                             );
@@ -74,8 +74,8 @@ public class SphereService extends Service {
      */
     private class AuthorizedJsonRequest extends JsonObjectRequest {
 
-        public AuthorizedJsonRequest(final int method, final String url, final Response.Listener<JSONObject> listener, final Response.ErrorListener errorListener) {
-            super(method, url, listener, errorListener);
+        public AuthorizedJsonRequest(final int method, final String url, final String requestBody, final Response.Listener<JSONObject> listener, final Response.ErrorListener errorListener) {
+            super(method, url, requestBody, listener, errorListener);
         }
 
         @Override
@@ -123,14 +123,6 @@ public class SphereService extends Service {
             final AuthenticationServiceBinder binder = (AuthenticationServiceBinder) service;
             authService = binder.getService();
             bound = true;
-            requestAccessToken(
-                    new Response.Listener<JSONObject>() {
-                        @Override
-                        public void onResponse(JSONObject response) {
-                            setAccessToken(response);
-                        }
-                    }
-            );
         }
 
         @Override
