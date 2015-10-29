@@ -33,6 +33,11 @@ public class SphereService extends Service {
     public SphereService() {
     }
 
+    public void executeRequest(final SphereRequest request, final Response.Listener<JSONObject> listener, final Response.ErrorListener errorListener) {
+        System.out.println(request.getUrl());
+        executeRequest(request.method, request.getUrl(), request.body, listener, errorListener);
+    }
+
     public void executeRequest(final int method, final String url, final String requestBody, final Response.Listener<JSONObject> listener, final Response.ErrorListener errorListener) {
         globalRequestQueue.addToRequestQueue(
                 new AuthorizedJsonRequest(method, sphereApiHost + projectKey + url, requestBody, listener, new Response.ErrorListener() {

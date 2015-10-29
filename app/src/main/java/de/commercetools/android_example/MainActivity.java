@@ -10,7 +10,6 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
 
-import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 
@@ -63,7 +62,8 @@ public class MainActivity extends AppCompatActivity {
 
     public void executeExampleRequest(View view) {
         if(bound) {
-            sphereService.executeRequest(Request.Method.GET, "/products", "",
+            final SphereRequest request = SphereRequest.get("/products").limit(5);
+            sphereService.executeRequest(request,
                     new Response.Listener<JSONObject>() {
                         @Override
                         public void onResponse(JSONObject response) {
