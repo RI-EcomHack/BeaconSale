@@ -8,6 +8,7 @@ import android.content.ServiceConnection;
 import android.os.IBinder;
 
 import com.android.volley.Response;
+import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 
 import org.json.JSONException;
@@ -15,6 +16,8 @@ import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.Map;
+
+import static java.net.HttpURLConnection.HTTP_UNAUTHORIZED;
 
 public class SphereService extends Service {
     private GlobalRequestQueue globalRequestQueue;
@@ -32,26 +35,38 @@ public class SphereService extends Service {
 
     public void executeRequest(final int method, final String url, final Response.Listener<JSONObject> listener, final Response.ErrorListener errorListener) {
         globalRequestQueue.addToRequestQueue(
-                new AuthorizedJsonRequest(method, sphereApiHost + projectKey + url, listener, errorListener));
-    }
-
-    private void requestAccessToken() {
-        if (bound) {
-            authService.getAccessToken(
-                    new Response.Listener<JSONObject>() {
-                        @Override
-                        public void onResponse(JSONObject response) {
-                            try {
-                                accessToken = response.get("access_token").toString();
-                            } catch (JSONException e) {
-                                throw new AssertionError(e);
-                            }
-                            // retry request
+                new AuthorizedJsonRequest(method, sphereApiHost + projectKey + url, listener, new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        if (error.networkResponse != null && error.networkResponse.statusCode == HTTP_UNAUTHORIZED) {
+                            requestAccessToken(
+                                    new Response.Listener<JSONObject>() {
+                                        @Override
+                                        public void onResponse(JSONObject response) {
+                                            setAccessToken(response);
+                                            executeRequest(method, url, listener, errorListener);
+                                        }
+                                    }
+                            );
+                        } else {
+                            errorListener.onErrorResponse(error);
                         }
                     }
-            );
-        }
+                }));
+    }
 
+    private void requestAccessToken(final Response.Listener<JSONObject> listener) {
+        if (bound) {
+            authService.getAccessToken(listener);
+        }
+    }
+
+    private void setAccessToken(final JSONObject response) {
+        try {
+            accessToken = response.get("access_token").toString();
+        } catch (JSONException e) {
+            throw new AssertionError(e);
+        }
     }
 
     /**
@@ -108,7 +123,14 @@ public class SphereService extends Service {
             final AuthenticationServiceBinder binder = (AuthenticationServiceBinder) service;
             authService = binder.getService();
             bound = true;
-            requestAccessToken();
+            requestAccessToken(
+                    new Response.Listener<JSONObject>() {
+                        @Override
+                        public void onResponse(JSONObject response) {
+                            setAccessToken(response);
+                        }
+                    }
+            );
         }
 
         @Override
