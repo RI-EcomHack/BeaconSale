@@ -60,7 +60,7 @@ public class AuthenticationService extends Service {
     }
 
     /**
-     * Set your credentials in credentials.xml (consult the readme for details)
+     * Set your credentials in credentials.xml (See README.md for details)
      * https://github.com/sphereio/commercetools-android-example/tree/master#commercetools-android-example
      */
     private String createBasicAuthToken() {
