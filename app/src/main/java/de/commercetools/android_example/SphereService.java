@@ -7,13 +7,18 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.IBinder;
 
+import com.android.volley.NetworkResponse;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.JsonRequest;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -34,8 +39,23 @@ public class SphereService extends Service {
     }
 
     public void executeRequest(final SphereRequest request, final Response.Listener<JSONObject> listener, final Response.ErrorListener errorListener) {
-        System.out.println(request.getUrl());
         executeRequest(request.method, request.getUrl(), request.body, listener, errorListener);
+    }
+
+    public void executeJacksonRequest(final SphereRequest request, final Response.Listener<JsonNode> listener, final Response.ErrorListener errorListener) {
+        final Response.Listener<JSONObject> jsonObjectListener = new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+                final ObjectMapper mapper = new ObjectMapper();
+                try {
+                    JsonNode jsonNode = mapper.readValue(response.toString(), JsonNode.class);
+                    listener.onResponse(jsonNode);
+                } catch (IOException e) {
+                    throw new AssertionError("");
+                }
+            }
+        };
+        executeRequest(request, jsonObjectListener, errorListener);
     }
 
     public void executeRequest(final int method, final String url, final String requestBody, final Response.Listener<JSONObject> listener, final Response.ErrorListener errorListener) {
