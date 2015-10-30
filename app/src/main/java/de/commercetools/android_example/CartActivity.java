@@ -98,8 +98,7 @@ public class CartActivity extends ListActivity {
     private void processJson(final JsonNode cart) {
         final Iterator<JsonNode> lineItems = cart.get("lineItems").elements();
         while (lineItems.hasNext()) {
-            JsonNode next = lineItems.next();
-            lineItemList.add(createLineItemEntry(next));
+            lineItemList.add(createLineItemEntry(lineItems.next()));
         }
     }
 

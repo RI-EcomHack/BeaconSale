@@ -8,11 +8,9 @@ import android.content.ServiceConnection;
 import android.os.IBinder;
 import android.util.Log;
 
-import com.android.volley.NetworkResponse;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
-import com.android.volley.toolbox.JsonRequest;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -88,8 +86,7 @@ public class SphereService extends Service {
             public void onResponse(JSONObject response) {
                 final ObjectMapper mapper = new ObjectMapper();
                 try {
-                    JsonNode jsonNode = mapper.readValue(response.toString(), JsonNode.class);
-                    listener.onResponse(jsonNode);
+                    listener.onResponse(mapper.readValue(response.toString(), JsonNode.class));
                 } catch (IOException e) {
                     throw new AssertionError("");
                 }
