@@ -8,6 +8,16 @@ import java.net.URLEncoder;
 
 import static java.util.Arrays.*;
 
+/**
+ * This class should help you to build the common requests to the sphere-api.
+ * For the documentation on how to filter, sort, etc. see http://dev.sphere.io/http-api.html
+ *
+ * You can enter predicates in clear text like: request.where( "masterData(current(slug(en=\"peter-42\")))" );
+ * Quotes have to be escaped.
+ *
+ * Note that for 'where' and 'expand' you can add multiple clauses, which will be appended, while for 'sort', 'query',
+ * 'offset' and 'limit' previously defined values will be overwritten.
+ */
 public class SphereRequest {
     private static final String UTF_8 = "UTF-8";
 
