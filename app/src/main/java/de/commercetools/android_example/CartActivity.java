@@ -74,10 +74,13 @@ public class CartActivity extends ListActivity {
                 new Response.Listener<JsonNode>() {
                     @Override
                     public void onResponse(JsonNode response) {
+                        final SharedPreferences.Editor edit = prefs.edit();
+                        edit.remove(CART_ID);
+                        edit.remove(CART_VERSION);
+                        edit.commit();
                         CartActivity.this.finish();
                     }
                 });
-
     }
 
     private void addProductToCart(final String productId, final JsonNode cart) {
