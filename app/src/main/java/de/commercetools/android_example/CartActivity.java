@@ -32,26 +32,23 @@ public class CartActivity extends ListActivity {
     private ArrayList<HashMap<String, String>> lineItemList = new ArrayList<>();
 
     private SphereService sphereService;
-    private boolean bound = false;
 
     private void createCartAndAddProduct(final String productId) {
-        if (bound) {
-            ObjectNode body = mapper.createObjectNode();
-            body.put("currency", "EUR");
+        ObjectNode body = mapper.createObjectNode();
+        body.put("currency", "EUR");
 
-            final SphereRequest request = SphereRequest.post("/carts", body.toString());
-            sphereService.executeJacksonRequest(request,
-                    new Response.Listener<JsonNode>() {
-                        @Override
-                        public void onResponse(JsonNode response) {
-                           final SharedPreferences prefs = getSharedPreferences("ctp.cart", 0);
-                            final SharedPreferences.Editor edit = prefs.edit();
-                            edit.putString(CART_ID, response.get("id").asText());
-                            addProductToCart(productId, response);
-                            edit.commit();
-                        }
-                    });
-        }
+        final SphereRequest request = SphereRequest.post("/carts", body.toString());
+        sphereService.executeJacksonRequest(request,
+                new Response.Listener<JsonNode>() {
+                    @Override
+                    public void onResponse(JsonNode response) {
+                       final SharedPreferences prefs = getSharedPreferences("ctp.cart", 0);
+                        final SharedPreferences.Editor edit = prefs.edit();
+                        edit.putString(CART_ID, response.get("id").asText());
+                        addProductToCart(productId, response);
+                        edit.commit();
+                    }
+                });
     }
 
     private void getCartAndAddProduct(final String productId, final String cartId) {
@@ -66,33 +63,31 @@ public class CartActivity extends ListActivity {
     }
 
     private void addProductToCart(final String productId, final JsonNode cart) {
-        if (bound) {
-            final String cartId = cart.get("id").asText();
-            final Long cartVersion = cart.get("version").asLong();
+        final String cartId = cart.get("id").asText();
+        final Long cartVersion = cart.get("version").asLong();
 
-            final ObjectNode body = mapper.createObjectNode();
-            final ArrayNode actions = mapper.createArrayNode();
-            final ObjectNode action = mapper.createObjectNode();
-            body.put("version", cartVersion);
-            body.set("actions", actions);
-            actions.add(action);
-            action.put("action", "addLineItem");
-            action.put("productId", productId);
-            action.put("variantId", 1);
-            action.put("quantity", 1);
+        final ObjectNode body = mapper.createObjectNode();
+        final ArrayNode actions = mapper.createArrayNode();
+        final ObjectNode action = mapper.createObjectNode();
+        body.put("version", cartVersion);
+        body.set("actions", actions);
+        actions.add(action);
+        action.put("action", "addLineItem");
+        action.put("productId", productId);
+        action.put("variantId", 1);
+        action.put("quantity", 1);
 
-            Log.d(this.getClass().getSimpleName(), body.asText());
+        Log.d(this.getClass().getSimpleName(), body.asText());
 
-            final SphereRequest addLineItem = SphereRequest.post("/carts/" + cartId, body.toString());
-            sphereService.executeJacksonRequest(addLineItem,
-                    new Response.Listener<JsonNode>() {
-                        @Override
-                        public void onResponse(JsonNode response) {
-                            processJson(response);
-                            setAdapter();
-                        }
-                    });
-        }
+        final SphereRequest addLineItem = SphereRequest.post("/carts/" + cartId, body.toString());
+        sphereService.executeJacksonRequest(addLineItem,
+                new Response.Listener<JsonNode>() {
+                    @Override
+                    public void onResponse(JsonNode response) {
+                        processJson(response);
+                        setAdapter();
+                    }
+                });
     }
 
     private void processJson(final JsonNode cart) {
@@ -147,10 +142,7 @@ public class CartActivity extends ListActivity {
     @Override
     protected void onStop() {
         super.onStop();
-        if (bound) {
-            unbindService(sphereServiceConnection);
-            bound = false;
-        }
+        unbindService(sphereServiceConnection);
     }
 
     /**
@@ -162,7 +154,6 @@ public class CartActivity extends ListActivity {
         public void onServiceConnected(ComponentName className, IBinder service) {
             final SphereServiceBinder binder = (SphereServiceBinder) service;
             sphereService = binder.getService();
-            bound = true;
 
             final SharedPreferences prefs = getSharedPreferences("ctp.cart", 0);
             final String productId = getIntent().getStringExtra("productId");
@@ -173,10 +164,8 @@ public class CartActivity extends ListActivity {
                 getCartAndAddProduct(productId, prefs.getString(CART_ID, null));
             }
         }
-
         @Override
         public void onServiceDisconnected(ComponentName className) {
-            bound = false;
         }
     };
 }

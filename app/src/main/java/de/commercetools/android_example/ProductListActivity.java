@@ -26,7 +26,6 @@ public class ProductListActivity extends ListActivity {
 
     private SphereService sphereService;
 
-    private boolean bound = false;
     private ProgressDialog progressDialog;
     private ArrayList<HashMap<String, String>> productList;
     private ArrayList<JsonNode> products;
@@ -59,10 +58,7 @@ public class ProductListActivity extends ListActivity {
     @Override
     protected void onStop() {
         super.onStop();
-        if (bound) {
-            unbindService(sphereServiceConnection);
-            bound = false;
-        }
+        unbindService(sphereServiceConnection);
     }
 
     /**
@@ -74,13 +70,11 @@ public class ProductListActivity extends ListActivity {
         public void onServiceConnected(ComponentName className, IBinder service) {
             final SphereServiceBinder binder = (SphereServiceBinder) service;
             sphereService = binder.getService();
-            bound = true;
             new GetProducts().execute();
         }
 
         @Override
         public void onServiceDisconnected(ComponentName className) {
-            bound = false;
         }
     };
 
