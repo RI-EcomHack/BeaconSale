@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.IBinder;
+import android.util.Log;
 
 import com.android.volley.NetworkResponse;
 import com.android.volley.Response;
@@ -35,11 +36,50 @@ public class SphereService extends Service {
 
     private boolean bound = false;
 
+
+    private Response.ErrorListener defaultErrorListener = new Response.ErrorListener() {
+        @Override
+        public void onErrorResponse(VolleyError error) {
+            logError(error);
+        }
+    };
+
+    private Response.Listener<JSONObject> defaultSuccessListener = new Response.Listener<JSONObject>() {
+        @Override
+        public void onResponse(JSONObject response) {
+            Log.i(this.getClass().getSimpleName(), response.toString());
+        }
+    };
+
     public SphereService() {
+    }
+
+    public void executeRequest(final SphereRequest request) {
+        executeRequest(request, null, null);
+    }
+
+    public void executeRequest(final SphereRequest request, final Response.Listener<JSONObject> listener) {
+        executeRequest(request, listener, null);
+    }
+
+    public void executeRequest(final SphereRequest request, final Response.ErrorListener errorListener) {
+        executeRequest(request, null, errorListener);
     }
 
     public void executeRequest(final SphereRequest request, final Response.Listener<JSONObject> listener, final Response.ErrorListener errorListener) {
         executeRequest(request.method, request.getUrl(), request.body, listener, errorListener);
+    }
+
+    public void executeJacksonRequest(final SphereRequest request) {
+        executeRequest(request, null, null);
+    }
+
+    public void executeJacksonRequest(final SphereRequest request, final Response.Listener<JsonNode> listener) {
+        executeJacksonRequest(request, listener, null);
+    }
+
+    public void executeJacksonRequest(final SphereRequest request, final Response.ErrorListener errorListener) {
+        executeRequest(request, null, errorListener);
     }
 
     public void executeJacksonRequest(final SphereRequest request, final Response.Listener<JsonNode> listener, final Response.ErrorListener errorListener) {
@@ -59,25 +99,29 @@ public class SphereService extends Service {
     }
 
     public void executeRequest(final int method, final String url, final String requestBody, final Response.Listener<JSONObject> listener, final Response.ErrorListener errorListener) {
+        final Response.Listener<JSONObject> l = listener == null ? defaultSuccessListener : listener;
+        final Response.ErrorListener e = errorListener == null ? defaultErrorListener : errorListener;
+
         globalRequestQueue.addToRequestQueue(
-                new AuthorizedJsonRequest(method, sphereApiHost + projectKey + url, requestBody, listener, new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        if (error.networkResponse != null && error.networkResponse.statusCode == HTTP_UNAUTHORIZED) {
-                            requestAccessToken(
-                                    new Response.Listener<JSONObject>() {
-                                        @Override
-                                        public void onResponse(JSONObject response) {
-                                            setAccessToken(response);
-                                            executeRequest(method, url, requestBody, listener, errorListener);
-                                        }
-                                    }
-                            );
-                        } else {
-                            errorListener.onErrorResponse(error);
-                        }
-                    }
-                }));
+                new AuthorizedJsonRequest(method, sphereApiHost + projectKey + url, requestBody, l,
+                        new Response.ErrorListener() {
+                            @Override
+                            public void onErrorResponse(VolleyError error) {
+                                if (error.networkResponse != null && error.networkResponse.statusCode == HTTP_UNAUTHORIZED) {
+                                    requestAccessToken(
+                                            new Response.Listener<JSONObject>() {
+                                                @Override
+                                                public void onResponse(JSONObject response) {
+                                                    setAccessToken(response);
+                                                    executeRequest(method, url, requestBody, l, e);
+                                                }
+                                            }
+                                    );
+                                } else {
+                                    e.onErrorResponse(error);
+                                }
+                            }
+                        }));
     }
 
     private void requestAccessToken(final Response.Listener<JSONObject> listener) {
@@ -91,6 +135,14 @@ public class SphereService extends Service {
             accessToken = response.get("access_token").toString();
         } catch (JSONException e) {
             throw new AssertionError(e);
+        }
+    }
+
+    private void logError(VolleyError error) {
+        if (error.networkResponse == null) {
+            Log.e(this.getClass().getSimpleName(), "No Networkresponse received");
+        } else {
+            Log.e(this.getClass().getSimpleName(), new String(error.networkResponse.data));
         }
     }
 

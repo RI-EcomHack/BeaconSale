@@ -16,13 +16,8 @@ import android.widget.ListView;
 import android.widget.SimpleAdapter;
 
 import com.android.volley.Response;
-import com.android.volley.VolleyError;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
-import org.json.JSONObject;
-
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -43,10 +38,6 @@ public class ProductListActivity extends ListActivity {
         final String productId = products.get(position).get("id").textValue();
         intent.putExtra("productId", productId);
         startActivity(intent);
-    }
-
-    private void logError(final VolleyError error) {
-        Log.e(this.getClass().getSimpleName(), new String(error.networkResponse.data));
     }
 
     /**
@@ -113,18 +104,12 @@ public class ProductListActivity extends ListActivity {
         @Override
         protected Void doInBackground(Void... arg0) {
             final SphereRequest productRequest = SphereRequest.get("/products").limit(5);
-            sphereService.executeRequest(productRequest,
-                    new Response.Listener<JSONObject>() {
+            sphereService.executeJacksonRequest(productRequest,
+                    new Response.Listener<JsonNode>() {
                         @Override
-                        public void onResponse(JSONObject response) {
+                        public void onResponse(JsonNode response) {
                             processJson(response);
                             setAdapter();
-                        }
-                    },
-                    new Response.ErrorListener() {
-                        @Override
-                        public void onErrorResponse(VolleyError error) {
-                            logError(error);
                         }
                     });
             return null;
@@ -144,19 +129,13 @@ public class ProductListActivity extends ListActivity {
             setListAdapter(adapter);
         }
 
-        private void processJson(JSONObject queryResult) {
+        private void processJson(JsonNode queryResult) {
             if (queryResult != null) {
-                final ObjectMapper mapper = new ObjectMapper();
-                try {
-                    final JsonNode rootNode = mapper.readValue(queryResult.toString(), JsonNode.class);
-                    final Iterator<JsonNode> results = rootNode.findPath("results").elements();
-                    while (results.hasNext()) {
-                        JsonNode next = results.next();
-                        productList.add(createProductEntry(next));
-                        products.add(next);
-                    }
-                } catch (IOException e) {
-                    throw new AssertionError("Invalid json-response from sphere-api");
+                final Iterator<JsonNode> results = queryResult.get("results").elements();
+                while (results.hasNext()) {
+                    JsonNode next = results.next();
+                    productList.add(createProductEntry(next));
+                    products.add(next);
                 }
             } else {
                 Log.d(this.getClass().getSimpleName(), "Couldn't get any data from the url");

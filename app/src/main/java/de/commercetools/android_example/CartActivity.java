@@ -13,7 +13,6 @@ import android.widget.ListAdapter;
 import android.widget.SimpleAdapter;
 
 import com.android.volley.Response;
-import com.android.volley.VolleyError;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -51,12 +50,6 @@ public class CartActivity extends ListActivity {
                             addProductToCart(productId, response);
                             edit.commit();
                         }
-                    },
-                    new Response.ErrorListener() {
-                        @Override
-                        public void onErrorResponse(VolleyError error) {
-                            logError(error);
-                        }
                     });
         }
     }
@@ -68,12 +61,6 @@ public class CartActivity extends ListActivity {
                     @Override
                     public void onResponse(JsonNode response) {
                         addProductToCart(productId, response);
-                    }
-                },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        logError(error);
                     }
                 });
     }
@@ -103,12 +90,6 @@ public class CartActivity extends ListActivity {
                         public void onResponse(JsonNode response) {
                             processJson(response);
                             setAdapter();
-                        }
-                    },
-                    new Response.ErrorListener() {
-                        @Override
-                        public void onErrorResponse(VolleyError error) {
-                            logError(error);
                         }
                     });
         }
@@ -146,10 +127,6 @@ public class CartActivity extends ListActivity {
                 R.layout.line_item, new String[]{NAME_TAG, PRICE_TAG}, new int[]{R.id.productName, R.id.productPrice});
 
         setListAdapter(adapter);
-    }
-
-    private void logError(final VolleyError error) {
-        Log.e(this.getClass().getSimpleName(), new String(error.networkResponse.data));
     }
 
     /**
