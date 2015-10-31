@@ -3,6 +3,10 @@
     package="de.commercetools.android_example" >
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.BLUETOOTH"/>
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <uses-permission android:name="android.permission.INTERNET"/>
 
     <application
         android:allowBackup="true"
@@ -21,6 +25,22 @@
 
         <activity android:name=".CartActivity" >
         </activity>
+        <activity
+            android:name=".AllDemosActivity"
+            android:label="Estimote Demos"
+            android:screenOrientation="portrait">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+        </activity>
+        <activity
+            android:name="ListBeaconsActivity"
+            android:label="Select Beacon"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".NotifyDemoActivity"
+            android:label="Notify Demo"
+            android:screenOrientation="portrait"/>
 
         <service
             android:name=".SphereService"

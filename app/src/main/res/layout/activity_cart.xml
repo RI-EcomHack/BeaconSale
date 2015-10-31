@@ -18,6 +18,7 @@
         android:text="@string/deleteCart"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:onClick="deleteCart"/>
+        android:onClick="deleteCart"
+        android:background="@color/accent_material_dark"/>
 
 </LinearLayout>

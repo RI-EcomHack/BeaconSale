@@ -6,7 +6,7 @@ android {
 
     defaultConfig {
         applicationId "de.commercetools.android_example"
-        minSdkVersion 8
+        minSdkVersion 18
         targetSdkVersion 23
         versionCode 1
         versionName "1.0"
@@ -30,4 +30,6 @@ dependencies {
     compile 'com.android.support:appcompat-v7:23.1.0'
     compile 'com.mcxiaoke.volley:library:1.0.19'
     compile 'com.fasterxml.jackson.core:jackson-databind:2.6.3'
+    compile 'com.estimote:sdk:0.9.4@aar'
+    compile 'org.apache.httpcomponents:httpclient:4.4-alpha1'
 }
