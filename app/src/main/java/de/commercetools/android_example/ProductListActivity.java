@@ -23,6 +23,7 @@ import com.estimote.sdk.Beacon;
 import com.estimote.sdk.BeaconManager;
 import com.estimote.sdk.Region;
 import com.estimote.sdk.SystemRequirementsChecker;
+import com.estimote.sdk.connection.internal.EstimoteUuid;
 import com.fasterxml.jackson.databind.JsonNode;
 
 import java.util.ArrayList;
@@ -88,7 +89,17 @@ public class ProductListActivity extends ListActivity {
                         // Note that beacons reported here are already sorted by estimated
                         // distance between device and beacon.
                         for(Beacon beacon: beacons) {
-                            Log.i("thing." , beacon.getMacAddress().toString());
+                            Log.i("UUID", beacon.getProximityUUID().toString());
+                            Log.i("Major", Integer.toString(beacon.getMajor()));
+                            Log.i("Minor", Integer.toString(beacon.getMinor()));
+
+                            if (beacon.getProximityUUID().toString() == "b9407f30-f5f8-466e-aff9-25556b57fe6d"
+                                && beacon.getMajor() == 52008 && beacon.getMinor() == 23433) {
+
+
+
+                            }
+
                         }
                     }
                 });
