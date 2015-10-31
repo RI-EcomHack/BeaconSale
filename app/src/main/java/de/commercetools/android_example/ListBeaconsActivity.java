@@ -58,7 +58,7 @@ public class ListBeaconsActivity extends BaseActivity {
             // Note that beacons reported here are already sorted by estimated
             // distance between device and beacon.
             toolbar.setSubtitle("Found beacons: " + beacons.size());
-            adapter.replaceWith(beacons);
+              adapter.replaceWith(beacons);
           }
         });
       }

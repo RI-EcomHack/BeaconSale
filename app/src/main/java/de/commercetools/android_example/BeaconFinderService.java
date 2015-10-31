@@ -1,6 +1,24 @@
 package de.commercetools.android_example.adapters;
 
+import android.app.IntentService;
+import android.content.Intent;
+import android.os.Handler;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
+import java.net.URLConnection;
+
 public class BeaconFinderService extends IntentService {
+    /**
+     * Creates an IntentService.  Invoked by your subclass's constructor.
+     *
+     * @param name Used to name the worker thread, important only for debugging.
+     */
+    public BeaconFinderService(String name) {
+        super(name);
+    }
+
     @Override
     protected void onHandleIntent(Intent workIntent) {
         // Gets data from the incoming Intent
@@ -8,16 +26,8 @@ public class BeaconFinderService extends IntentService {
 
        new Handler().postDelayed(new Runnable() {
                public void run() {
-                   String url = "http://5.196.27.161:8080/customer_in_range/3be9c767-11c0-4280-ad5d-a3135a138c6c/2634";
-                   URL url = new URL(url);
-                      HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
-                      try {
-                        InputStream in = new BufferedInputStream(urlConnection.getInputStream());
-                        readStream(in);
-                       finally {
-                        urlConnection.disconnect();
-                      }
-                    }
+
+
                }
            }, 10000);
     }

@@ -26,6 +26,11 @@ import com.estimote.sdk.SystemRequirementsChecker;
 import com.estimote.sdk.connection.internal.EstimoteUuid;
 import com.fasterxml.jackson.databind.JsonNode;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -89,17 +94,24 @@ public class ProductListActivity extends ListActivity {
                         // Note that beacons reported here are already sorted by estimated
                         // distance between device and beacon.
                         for(Beacon beacon: beacons) {
-                            Log.i("UUID", beacon.getProximityUUID().toString());
-                            Log.i("Major", Integer.toString(beacon.getMajor()));
-                            Log.i("Minor", Integer.toString(beacon.getMinor()));
+                            Log.i("UUID", beacon.getProximityUUID().toString() + " " + Integer.toString(beacon.getMajor()) + " " + Integer.toString(beacon.getMinor()));
 
-                            if (beacon.getProximityUUID().toString() == "b9407f30-f5f8-466e-aff9-25556b57fe6d"
-                                && beacon.getMajor() == 52008 && beacon.getMinor() == 23433) {
+                            Log.i("UUID Check", (Boolean.toString(beacon.getProximityUUID().toString().equals("b9407f30-f5f8-466e-aff9-25556b57fe6d"))));
 
-
-
+                            if (beacon.getProximityUUID().toString().equals("b9407f30-f5f8-466e-aff9-25556b57fe6d")
+                                && (
+                                    (beacon.getMajor() == 52008 && beacon.getMinor() == 23433)
+                                    || (beacon.getMajor() == 51172 && beacon.getMinor() == 40913)
+                                )
+                            ) {
+                                try {
+                                    new NotifyAPI().execute(
+                                            new URL("http://5.196.27.161:8080/customer_in_range/3be9c767-11c0-4280-ad5d-a3135a138c6c/2634")
+                                    );
+                                } catch (MalformedURLException e) {
+                                    e.printStackTrace();
+                                }
                             }
-
                         }
                     }
                 });
@@ -231,5 +243,31 @@ public class ProductListActivity extends ListActivity {
             productEntry.put(NAME_TAG, masterData.get("name").get("en").textValue());
             return productEntry;
         }
+    }
+}
+
+
+class NotifyAPI extends AsyncTask<URL, Integer, Long> {
+
+    private Exception exception;
+
+    protected void onPostExecute() {
+        // TODO: check this.exception
+        // TODO: do something with the feed
+    }
+
+    @Override
+    protected Long doInBackground(URL... params) {
+        int count = params.length;
+        long totalSize = 0;
+        for (int i = 0; i < count; i++) {
+            try {
+                URLConnection connection = params[i].openConnection();
+                InputStream response = connection.getInputStream();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return totalSize;
     }
 }
