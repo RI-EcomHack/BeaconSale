@@ -12,22 +12,8 @@ import com.estimote.sdk.Beacon;
 import com.estimote.sdk.BeaconManager;
 import com.estimote.sdk.Region;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.client.ClientProtocolException;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
-import java.net.URL;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-
-import javax.net.ssl.HttpsURLConnection;
 
 import static com.estimote.sdk.BeaconManager.MonitoringListener;
 
@@ -123,79 +109,5 @@ public class NotifyDemoActivity extends BaseActivity {
   }
 
 
-
-
-  public void postData() throws JSONException{
-    // Create a new HttpClient and Post Header
-    HttpsURLConnection con = (HttpsURLConnection) url.openConnection();
-    URL url;
-
-    con.setReadTimeout(7000);
-    con.setConnectTimeout(7000);
-    con.setDoOutput(true);
-    con.setDoInput(true);
-    con.setInstanceFollowRedirects(false);
-    con.setRequestMethod("POST");
-    con.setFixedLengthStreamingMode(param.getBytes().length);
-    con.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
-
-    // Send
-    PrintWriter out = new PrintWriter(con.getOutputStream());
-    out.print(param);
-    out.close();
-
-    con.connect();
-
-    JSONObject json = new JSONObject();
-
-    try {
-      // JSON data:
-      json.put("name", "Fahmi Rahman");
-      json.put("position", "sysdev");
-
-      JSONArray postjson=new JSONArray();
-      postjson.put(json);
-
-      // Post the data:
-      httppost.setHeader("json",json.toString());
-      httppost.getParams().setParameter("jsonpost",postjson);
-
-      // Execute HTTP Post Request
-      System.out.print(json);
-      HttpResponse response = httpclient.execute(httppost);
-
-      // for JSON:
-      if(response != null)
-      {
-        InputStream is = response.getEntity().getContent();
-
-        BufferedReader reader = new BufferedReader(new InputStreamReader(is));
-        StringBuilder sb = new StringBuilder();
-
-        String line = null;
-        try {
-          while ((line = reader.readLine()) != null) {
-            sb.append(line + "\n");
-          }
-        } catch (IOException e) {
-          e.printStackTrace();
-        } finally {
-          try {
-            is.close();
-          } catch (IOException e) {
-            e.printStackTrace();
-          }
-        }
-        text = sb.toString();
-      }
-
-      tv.setText(text);
-
-    }catch (ClientProtocolException e) {
-      // TODO Auto-generated catch block
-    } catch (IOException e) {
-      // TODO Auto-generated catch block
-    }
-  }
-}
+  
 }
