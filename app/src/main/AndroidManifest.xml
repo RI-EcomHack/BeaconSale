@@ -54,6 +54,11 @@
             android:exported="false" >
 
         </service>
+
+        <service
+                android:name=".BeaconFinderService"
+                android:exported="false">
+        </service>
     </application>
 
 </manifest>
