@@ -1,14 +1,15 @@
 package de.commercetools.android_example;
 
 import android.app.ListActivity;
+import android.app.NotificationManager;
 import android.app.ProgressDialog;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.AsyncTask;
-import android.os.IBinder;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -18,19 +19,30 @@ import android.widget.ListView;
 import android.widget.SimpleAdapter;
 
 import com.android.volley.Response;
+import com.estimote.sdk.Beacon;
+import com.estimote.sdk.BeaconManager;
+import com.estimote.sdk.Region;
+import com.estimote.sdk.SystemRequirementsChecker;
 import com.fasterxml.jackson.databind.JsonNode;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 
 public class ProductListActivity extends ListActivity {
 
     private SphereService sphereService;
+    private static final Region ALL_ESTIMOTE_BEACONS_REGION = new Region("rid", null, null, null);
 
     private ProgressDialog progressDialog;
     private ArrayList<HashMap<String, String>> productList;
     private ArrayList<JsonNode> products;
+    private BeaconManager beaconManager;
+    private NotificationManager notificationManager;
+    private Region region;
+    private static final int NOTIFICATION_ID = 123;
+
 
     @Override
     protected void onListItemClick(ListView l, View v, int position, long id) {
@@ -64,7 +76,54 @@ public class ProductListActivity extends ListActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_product_list);
+
+
+        // Configure BeaconManager.
+        beaconManager = new BeaconManager(this);
+        beaconManager.setRangingListener(new BeaconManager.RangingListener() {
+            @Override public void onBeaconsDiscovered(Region region, final List<Beacon> beacons) {
+                // Note that results are not delivered on UI thread.
+                runOnUiThread(new Runnable() {
+                    @Override public void run() {
+                        // Note that beacons reported here are already sorted by estimated
+                        // distance between device and beacon.
+                        for(Beacon beacon: beacons) {
+                            Log.i("thing." , beacon.getMacAddress().toString());
+                        }
+                    }
+                });
+            }
+        });
+
     }
+
+    private void startScanning() {
+
+        beaconManager.connect(new BeaconManager.ServiceReadyCallback() {
+            @Override
+            public void onServiceReady() {
+                beaconManager.startRanging(ALL_ESTIMOTE_BEACONS_REGION);
+            }
+
+        });
+    }
+
+
+    @Override protected void onResume() {
+        super.onResume();
+
+        if (SystemRequirementsChecker.checkWithDefaultDialogs(this)) {
+            startScanning();
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        //notificationManager.cancel(NOTIFICATION_ID);
+        beaconManager.disconnect();
+        super.onDestroy();
+    }
+
 
     @Override
     protected void onStart() {
@@ -78,6 +137,7 @@ public class ProductListActivity extends ListActivity {
         super.onStop();
         unbindService(sphereServiceConnection);
     }
+
 
     /**
      * Defines callbacks for service binding, passed to bindService()

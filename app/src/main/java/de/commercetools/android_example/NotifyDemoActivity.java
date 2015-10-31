@@ -6,6 +6,7 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.speech.tts.TextToSpeech;
 import android.widget.TextView;
 
 import com.estimote.sdk.Beacon;
@@ -33,6 +34,7 @@ public class NotifyDemoActivity extends BaseActivity {
   private BeaconManager beaconManager;
   private NotificationManager notificationManager;
   private Region region;
+  private TextToSpeech tts;
 
   @Override protected int getLayoutResId() {
     return R.layout.notify_demo;
@@ -85,7 +87,6 @@ public class NotifyDemoActivity extends BaseActivity {
   }
 
   private void postNotification(String msg) {
-
     Intent notifyIntent = new Intent(NotifyDemoActivity.this, NotifyDemoActivity.class);
     notifyIntent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
     PendingIntent pendingIntent = PendingIntent.getActivities(
@@ -109,5 +110,5 @@ public class NotifyDemoActivity extends BaseActivity {
   }
 
 
-  
+
 }
