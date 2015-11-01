@@ -246,7 +246,7 @@ public class ProductListActivity extends ListActivity implements
                 body.put("email", "maxime.gaudron@rocket-internet.de");
                 body.put("password", "testtest");
 
-                final SphereRequest loginRequest = SphereRequest.post(getString(R.string.project) + "/login", body.toString());
+                final SphereRequest loginRequest = SphereRequest.post("/login", body.toString());
                 sphereService.executeJacksonRequest(loginRequest,
                     new Response.Listener<JsonNode>() {
                         @Override
