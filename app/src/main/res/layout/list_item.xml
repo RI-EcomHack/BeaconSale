@@ -11,6 +11,17 @@
     <TextView
         android:id="@+id/productName"
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content"/>
+        android:layout_height="wrap_content"
+        android:textSize="20sp"/>
+    <TextView
+        android:id="@+id/productDescription"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:textSize="15sp"/>
+    <TextView
+        android:id="@+id/metaProductDescription"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:textSize="15sp"/>
 
 </LinearLayout>
