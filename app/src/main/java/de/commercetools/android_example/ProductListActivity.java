@@ -91,27 +91,25 @@ public class ProductListActivity extends ListActivity implements
         // Configure BeaconManager.
         beaconManager = new BeaconManager(this);
         beaconManager.setRangingListener(new BeaconManager.RangingListener() {
-            @Override public void onBeaconsDiscovered(Region region, final List<Beacon> beacons) {
+            @Override
+            public void onBeaconsDiscovered(Region region, final List<Beacon> beacons) {
                 // Note that results are not delivered on UI thread.
                 runOnUiThread(new Runnable() {
-                    @Override public void run() {
+                    @Override
+                    public void run() {
                         // Note that beacons reported here are already sorted by estimated
                         // distance between device and beacon.
-                        for(Beacon beacon: beacons) {
+                        for (Beacon beacon : beacons) {
                             Log.i("UUID", beacon.getProximityUUID().toString() + " " + Integer.toString(beacon.getMajor()) + " " + Integer.toString(beacon.getMinor()));
 
-                            Log.i("UUID Check", (Boolean.toString(beacon.getProximityUUID().toString().equals("b9407f30-f5f8-466e-aff9-25556b57fe6d"))));
-
                             if (beacon.getProximityUUID().toString().equals("b9407f30-f5f8-466e-aff9-25556b57fe6d")
-                                && (
-                                    (beacon.getMajor() == 52008 && beacon.getMinor() == 23433)
-                                    || (beacon.getMajor() == 51172 && beacon.getMinor() == 40913)
-                                )
-                            ) {
+                                    && beacon.getMajor() == 52008
+                                    && beacon.getMinor() == 23433) {
+                                String id = beacon.getProximityUUID().toString() + beacon.getMajor() + beacon.getMinor();
                                 //speakOut("You are close to your beacon" + beacon.getProximityUUID().toString());
                                 try {
                                     new NotifyAPI().execute(
-                                            new URL("http://5.196.27.161:8080/customer_in_range/3be9c767-11c0-4280-ad5d-a3135a138c6c/2634")
+                                            new URL("http://5.196.27.161:8080/customer_in_range/3be9c767-11c0-4280-ad5d-a3135a138c6c/" + id)
                                     );
                                 } catch (MalformedURLException e) {
                                     e.printStackTrace();
