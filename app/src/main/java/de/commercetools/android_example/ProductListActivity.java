@@ -10,6 +10,7 @@ import android.content.ServiceConnection;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.speech.tts.TextToSpeech;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -23,7 +24,6 @@ import com.estimote.sdk.Beacon;
 import com.estimote.sdk.BeaconManager;
 import com.estimote.sdk.Region;
 import com.estimote.sdk.SystemRequirementsChecker;
-import com.estimote.sdk.connection.internal.EstimoteUuid;
 import com.fasterxml.jackson.databind.JsonNode;
 
 import java.io.IOException;
@@ -35,12 +35,14 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 
-public class ProductListActivity extends ListActivity {
+public class ProductListActivity extends ListActivity implements
+        TextToSpeech.OnInitListener {
 
     private SphereService sphereService;
     private static final Region ALL_ESTIMOTE_BEACONS_REGION = new Region("rid", null, null, null);
-
+    private TextToSpeech tts;
     private ProgressDialog progressDialog;
     private ArrayList<HashMap<String, String>> productList;
     private ArrayList<JsonNode> products;
@@ -70,7 +72,7 @@ public class ProductListActivity extends ListActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         int itemId = item.getItemId();
         if (itemId == R.id.action_settings) {
-
+            //speakOut();
         }
 
         return true;
@@ -83,6 +85,8 @@ public class ProductListActivity extends ListActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_product_list);
 
+
+        tts = new TextToSpeech(this, this);
 
         // Configure BeaconManager.
         beaconManager = new BeaconManager(this);
@@ -104,6 +108,7 @@ public class ProductListActivity extends ListActivity {
                                     || (beacon.getMajor() == 51172 && beacon.getMinor() == 40913)
                                 )
                             ) {
+                                //speakOut("You are close to your beacon" + beacon.getProximityUUID().toString());
                                 try {
                                     new NotifyAPI().execute(
                                             new URL("http://5.196.27.161:8080/customer_in_range/3be9c767-11c0-4280-ad5d-a3135a138c6c/2634")
@@ -120,6 +125,31 @@ public class ProductListActivity extends ListActivity {
 
     }
 
+    @Override
+    public void onInit(int status) {
+
+        if (status == TextToSpeech.SUCCESS) {
+
+            int result = tts.setLanguage(Locale.US);
+
+            if (result == TextToSpeech.LANG_MISSING_DATA
+                    || result == TextToSpeech.LANG_NOT_SUPPORTED) {
+                Log.e("TTS", "This Language is not supported");
+            } else {
+                Log.i("Speak", "speak here");
+               // speakOut();
+            }
+
+        } else {
+            Log.e("TTS", "Initilization Failed!");
+        }
+
+    }
+
+    private void speakOut(String toSpeak) {
+
+        tts.speak(toSpeak, TextToSpeech.QUEUE_FLUSH, null);
+    }
     private void startScanning() {
 
         beaconManager.connect(new BeaconManager.ServiceReadyCallback() {

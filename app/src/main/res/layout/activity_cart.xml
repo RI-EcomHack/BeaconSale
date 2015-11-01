@@ -20,5 +20,23 @@
         android:layout_height="wrap_content"
         android:onClick="deleteCart"
         android:background="@color/accent_material_dark"/>
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="20sp">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/black"
+            android:text="Total Cart Value: "
+            android:textSize="20sp"/>
+        <TextView
+            android:id="@+id/total_value"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/black"
+            android:textSize="25sp"/>
+    </LinearLayout>
 
 </LinearLayout>

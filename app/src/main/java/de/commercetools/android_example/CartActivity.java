@@ -6,12 +6,14 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
-import android.os.IBinder;
 import android.os.Bundle;
+import android.os.IBinder;
+import android.speech.tts.TextToSpeech;
 import android.util.Log;
 import android.view.View;
 import android.widget.ListAdapter;
 import android.widget.SimpleAdapter;
+import android.widget.TextView;
 
 import com.android.volley.Response;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -22,17 +24,21 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Locale;
 
-public class CartActivity extends ListActivity {
+public class CartActivity extends ListActivity implements
+        TextToSpeech.OnInitListener{
 
     private static final String CART_ID = "cartId";
     private static final String CART_VERSION = "cartVersion";
     private static final String NAME_TAG = "name";
     private static final String PRICE_TAG = "price";
+    private TextToSpeech tts;
 
     private ObjectMapper mapper = new ObjectMapper();
     private ArrayList<HashMap<String, String>> lineItemList = new ArrayList<>();
 
+    private double cartTotalValue = 0;
     private SphereService sphereService;
 
     private void createCartAndAddProduct(final String productId) {
@@ -124,6 +130,9 @@ public class CartActivity extends ListActivity {
         while (lineItems.hasNext()) {
             lineItemList.add(createLineItemEntry(lineItems.next()));
         }
+        TextView cartTotal = (TextView)this.findViewById(R.id.total_value);
+        cartTotal.setText(String.format("%.2f %s", cartTotalValue, "EUR"));
+        speakOut("Your Total is: " + String.format("%.2f %s", cartTotalValue, "Euro"));
     }
 
     private HashMap<String, String> createLineItemEntry(final JsonNode lineItem) {
@@ -135,11 +144,35 @@ public class CartActivity extends ListActivity {
         final int centAmount = totalPrice.get("centAmount").asInt();
         final String currencyCode = totalPrice.get("currencyCode").asText();
         final double euroAmount = centAmount / 100;
-
+        cartTotalValue += euroAmount;
         lineItemEntry.put(NAME_TAG, quantity + "x " + name);
         lineItemEntry.put(PRICE_TAG, String.format("%.2f %s", euroAmount, currencyCode));
 
         return lineItemEntry;
+    }
+
+    @Override
+    public void onInit(int status) {
+
+        if (status == TextToSpeech.SUCCESS) {
+
+            int result = tts.setLanguage(Locale.US);
+
+            if (result == TextToSpeech.LANG_MISSING_DATA
+                    || result == TextToSpeech.LANG_NOT_SUPPORTED) {
+                Log.e("TTS", "This Language is not supported");
+            } else {
+                Log.i("Speak", "speak here");
+                // speakOut();
+            }
+
+        } else {
+            Log.e("TTS", "Initilization Failed!");
+        }
+    }
+
+    private void speakOut(String toSpeak) {
+        tts.speak(toSpeak, TextToSpeech.QUEUE_FLUSH, null);
     }
 
     protected void setAdapter() {
@@ -159,6 +192,7 @@ public class CartActivity extends ListActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_cart);
+        tts = new TextToSpeech(this, this);
     }
 
     @Override
