@@ -11,6 +11,7 @@ import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
+import com.fasterxml.jackson.databind.JsonNode;
 
 import org.json.JSONObject;
 
@@ -21,11 +22,25 @@ public class AuthenticationService extends Service {
     private GlobalRequestQueue globalRequestQueue;
     private Context context;
 
+    private SphereService sphereService;
+
     public AuthenticationService() {
     }
 
     public void getAccessToken(final Response.Listener<JSONObject> listener) {
         globalRequestQueue.addToRequestQueue(getAccessTokenRequest(listener));
+
+        final SphereRequest loginRequest = SphereRequest.post(getString(R.string.project) + "/login", "email=maxime.gaudron@rocket-internet.de&password=testtest");
+        sphereService.executeJacksonRequest(loginRequest,
+                new Response.Listener<JsonNode>() {
+                    @Override
+                    public void onResponse(JsonNode response) {
+                        final Toast toast = Toast.makeText(context, response.toString(), Toast.LENGTH_LONG);
+                        toast.show();
+                    }
+                });
+
+
     }
 
     private JsonObjectRequest getAccessTokenRequest(final Response.Listener<JSONObject> listener) {
