@@ -6,6 +6,16 @@
     android:layout_height="match_parent"
     android:orientation="vertical" >
 
+    <TextView
+        android:layout_width="fill_parent"
+        android:layout_height="60sp"
+        android:textSize="35sp"
+        android:background="@color/accent_material_dark"
+        android:textColor="@color/accent_material_light"
+        android:text="Available Products!!!"
+        android:layout_marginBottom="20sp"
+        android:layout_gravity="center_horizontal" />
+
     <!-- Main ListView
          Always give id value as list(@android:id/list)
     -->

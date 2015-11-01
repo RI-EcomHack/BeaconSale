@@ -18,7 +18,6 @@ import android.view.View;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
-import android.widget.Toast;
 
 import com.android.volley.Response;
 import com.estimote.sdk.Beacon;
@@ -28,8 +27,6 @@ import com.estimote.sdk.SystemRequirementsChecker;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-
-import org.json.JSONObject;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -217,6 +214,10 @@ public class ProductListActivity extends ListActivity implements
      */
     private class GetProducts extends AsyncTask<Void, Void, Void> {
         private static final String NAME_TAG = "name";
+        private static final String DESCRIPTION_TAG = "descrtiption";
+        private static final String META_DESCRIPTION_TAG = "metaDescrtiption";
+        private static final String PRICE_TAG = "price";
+
 
         @Override
         protected void onPreExecute() {
@@ -232,7 +233,8 @@ public class ProductListActivity extends ListActivity implements
         @Override
         protected Void doInBackground(Void... arg0) {
 
-            final SphereRequest productRequest = SphereRequest.get("/products").limit(5);
+            final SphereRequest productRequest = SphereRequest.get("/products").limit(10);
+
             sphereService.executeJacksonRequest(productRequest,
                     new Response.Listener<JsonNode>() {
                         @Override
@@ -267,7 +269,8 @@ public class ProductListActivity extends ListActivity implements
              * Updating parsed JSON data into ListView
              * */
             final ListAdapter adapter = new SimpleAdapter(ProductListActivity.this, productList,
-                    R.layout.list_item, new String[]{NAME_TAG}, new int[]{R.id.productName});
+                    R.layout.list_item, new String[]{NAME_TAG, DESCRIPTION_TAG},
+                    new int[]{R.id.productName, R.id.productDescription});
 
             setListAdapter(adapter);
         }
@@ -288,12 +291,17 @@ public class ProductListActivity extends ListActivity implements
         private HashMap<String, String> createProductEntry(final JsonNode productJson) {
             final HashMap<String, String> productEntry = new HashMap<>();
             final JsonNode masterData = productJson.get("masterData").get("current");
+            //final JsonNode totalPrice = productJson.get("totalPrice");
+            //final int centAmount = totalPrice.get("centAmount").asInt();
+            //final String currencyCode = totalPrice.get("currencyCode").asText();
+           // final double euroAmount = centAmount / 100;
             productEntry.put(NAME_TAG, masterData.get("name").get("en").textValue());
+            productEntry.put(DESCRIPTION_TAG, masterData.get("description").get("en").textValue());
+            //productEntry.put(PRICE_TAG, String.format("%.2f %s", Float.parseFloat(masterData.get("quantity").textValue()), "Euro"));
             return productEntry;
         }
     }
 }
-
 
 class NotifyAPI extends AsyncTask<URL, Integer, Long> {
 
