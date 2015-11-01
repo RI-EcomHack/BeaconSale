@@ -226,6 +226,7 @@ public class ProductListActivity extends ListActivity implements
 
         @Override
         protected Void doInBackground(Void... arg0) {
+
             final SphereRequest productRequest = SphereRequest.get("/products").limit(5);
             sphereService.executeJacksonRequest(productRequest,
                     new Response.Listener<JsonNode>() {
