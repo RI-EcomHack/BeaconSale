@@ -114,7 +114,7 @@ public class ProductListActivity extends ListActivity implements
                                 //speakOut("You are close to your beacon" + beacon.getProximityUUID().toString());
                                 try {
                                     new NotifyAPI().execute(
-                                            new URL("http://5.196.27.161:8080/customer_in_range/3be9c767-11c0-4280-ad5d-a3135a138c6c/" + id)
+                                            new URL("http://5.196.27.161:8080/customer_in_range/c3a08c40-64b2-4ab0-ad65-b06ca9162c45/" + id)
                                     );
                                 } catch (MalformedURLException e) {
                                     e.printStackTrace();

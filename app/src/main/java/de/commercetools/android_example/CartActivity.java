@@ -44,6 +44,7 @@ public class CartActivity extends ListActivity implements
     private void createCartAndAddProduct(final String productId) {
         ObjectNode body = mapper.createObjectNode();
         body.put("currency", "EUR");
+        body.put("customerId", "c3a08c40-64b2-4ab0-ad65-b06ca9162c45");
 
         final SphereRequest request = SphereRequest.post("/carts", body.toString());
         sphereService.executeJacksonRequest(request,
