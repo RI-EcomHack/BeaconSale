@@ -132,8 +132,8 @@ public class CartActivity extends ListActivity implements
             lineItemList.add(createLineItemEntry(lineItems.next()));
         }
         TextView cartTotal = (TextView)this.findViewById(R.id.total_value);
-        cartTotal.setText(String.format("%.2f %s", cartTotalValue, "EUR"));
-        speakOut("Your Total is: " + String.format("%.2f %s", cartTotalValue, "Euro"));
+        cartTotal.setText(String.format("%.2f %s", cart.get("totalPrice").get("centAmount").asDouble()/100, "EUR"));
+        speakOut("Your Total is: " + String.format("%.2f %s", cart.get("totalPrice").get("centAmount").asDouble()/100, "Euro"));
     }
 
     private HashMap<String, String> createLineItemEntry(final JsonNode lineItem) {
@@ -141,13 +141,22 @@ public class CartActivity extends ListActivity implements
 
         final String name = lineItem.get("name").get("en").asText();
         final long quantity = lineItem.get("quantity").asLong();
-        final JsonNode totalPrice = lineItem.get("totalPrice");
+        final JsonNode totalPrice = lineItem.get("price").get("value");
+        final JsonNode discountedPrice = lineItem.get("discountedPrice");
         final int centAmount = totalPrice.get("centAmount").asInt();
         final String currencyCode = totalPrice.get("currencyCode").asText();
         final double euroAmount = centAmount / 100;
-        cartTotalValue += euroAmount;
+
         lineItemEntry.put(NAME_TAG, quantity + "x " + name);
-        lineItemEntry.put(PRICE_TAG, String.format("%.2f %s", euroAmount, currencyCode));
+
+        if (discountedPrice != null) {
+            lineItemEntry.put(PRICE_TAG, String.format("%.2f %s, discount %.2f EUR", euroAmount, currencyCode, discountedPrice.get("value").get("centAmount").asDouble()/100));
+        } else {
+            lineItemEntry.put(PRICE_TAG, String.format("%.2f %s", euroAmount, currencyCode));
+        }
+
+
+
 
         return lineItemEntry;
     }
