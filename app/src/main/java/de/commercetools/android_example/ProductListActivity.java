@@ -18,6 +18,7 @@ import android.view.View;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
+import android.widget.Toast;
 
 import com.android.volley.Response;
 import com.estimote.sdk.Beacon;
@@ -25,6 +26,10 @@ import com.estimote.sdk.BeaconManager;
 import com.estimote.sdk.Region;
 import com.estimote.sdk.SystemRequirementsChecker;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
+import org.json.JSONObject;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -50,7 +55,7 @@ public class ProductListActivity extends ListActivity implements
     private NotificationManager notificationManager;
     private Region region;
     private static final int NOTIFICATION_ID = 123;
-
+    private ObjectMapper mapper = new ObjectMapper();
 
     @Override
     protected void onListItemClick(ListView l, View v, int position, long id) {
@@ -236,6 +241,20 @@ public class ProductListActivity extends ListActivity implements
                             setAdapter();
                         }
                     });
+
+                ObjectNode body = mapper.createObjectNode();
+                body.put("email", "maxime.gaudron@rocket-internet.de");
+                body.put("password", "testtest");
+
+                final SphereRequest loginRequest = SphereRequest.post(getString(R.string.project) + "/login", body.toString());
+                sphereService.executeJacksonRequest(loginRequest,
+                    new Response.Listener<JsonNode>() {
+                        @Override
+                        public void onResponse(JsonNode response) {
+                            Log.i("customer login", response.toString());
+                        }
+                    }
+                );
             return null;
         }
 

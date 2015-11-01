@@ -23,31 +23,12 @@ import java.util.Map;
 public class AuthenticationService extends Service {
     private GlobalRequestQueue globalRequestQueue;
     private Context context;
-    private ObjectMapper mapper = new ObjectMapper();
-    private SphereService sphereService;
 
     public AuthenticationService() {
     }
 
     public void getAccessToken(final Response.Listener<JSONObject> listener) {
         globalRequestQueue.addToRequestQueue(getAccessTokenRequest(listener));
-
-
-        ObjectNode body = mapper.createObjectNode();
-        body.put("email", "maxime.gaudron@rocket-internet.de");
-        body.put("password", "testtest");
-
-        final SphereRequest loginRequest = SphereRequest.post(getString(R.string.project) + "/login", body.toString());
-        sphereService.executeJacksonRequest(loginRequest,
-                new Response.Listener<JsonNode>() {
-                    @Override
-                    public void onResponse(JsonNode response) {
-                        final Toast toast = Toast.makeText(context, response.toString(), Toast.LENGTH_LONG);
-                        toast.show();
-                    }
-                });
-
-
     }
 
     private JsonObjectRequest getAccessTokenRequest(final Response.Listener<JSONObject> listener) {
